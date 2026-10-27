@@ -66,14 +66,13 @@ export async function savePart(partData: any) {
 }
 
 export async function recordMovement(partId: string, type: 'IN' | 'OUT' | 'ADJUST', quantity: number, reason: string) {
-  // ดึงยอดปัจจุบันก่อนปรับ
   const { data: item } = await supabase.from('inventory_items').select('stock_qty').eq('id', partId).single();
-  if (!item) throw new Error('ไม่พบอะไหล่');
+  if (!item) throw new Error('ไม่พบรายการอะไหล่');
 
   let newQty = item.stock_qty;
   if (type === 'IN') newQty += quantity;
   else if (type === 'OUT') {
-    if (item.stock_qty < quantity) throw new Error('อะไหล่ในสต๊อกไม่พอ');
+    if (item.stock_qty < quantity) throw new Error('จำนวนอะไหล่ในสต๊อกไม่พอเบิก');
     newQty -= quantity;
   } else if (type === 'ADJUST') newQty = quantity;
 
